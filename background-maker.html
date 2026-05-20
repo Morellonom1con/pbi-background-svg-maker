@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GitHub Actions SVG Banner Maker</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
+<style>
+  :root {
+    --bg: #0f0f11;
+    --surface: #17171a;
+    --surface2: #1e1e22;
+    --border: rgba(255,255,255,0.07);
+    --border2: rgba(255,255,255,0.13);
+    --text: #e8e8ea;
+    --text2: #888890;
+    --text3: #555560;
+    --accent: #7c6aff;
+    --accent-dim: rgba(124,106,255,0.15);
+    --danger: #ff5a5a;
+    --danger-dim: rgba(255,90,90,0.12);
+    --radius: 8px;
+    --radius-sm: 5px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; background: var(--bg); color: var(--text); font-family: 'SF Mono', 'Fira Code', monospace; font-size: 13px; }
+
+  header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 24px;
+    border-bottom: 0.5px solid var(--border);
+    background: var(--surface);
+  }
+  .logo-mark {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .logo-mark svg { width: 22px; height: 22px; }
+  .logo-mark span { font-size: 14px; font-weight: 600; letter-spacing: -0.02em; color: var(--text); }
+  .logo-mark span em { color: var(--accent); font-style: normal; }
+  .header-meta { font-size: 11px; color: var(--text3); }
+
+  .app {
+    display: grid;
+    grid-template-columns: 320px 1fr;
+    height: calc(100vh - 49px);
+  }
+
+  .sidebar {
+    background: var(--surface);
+    border-right: 0.5px solid var(--border);
+    overflow-y: auto;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border2) transparent;
+  }
+
+  .preview-pane {
+    background: var(--bg);
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    overflow: hidden;
+  }
+
+  .sec {
+    background: var(--surface2);
+    border: 0.5px solid var(--border);
+    border-radius: var(--radius);
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+  }
+
+  .sec-title {
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--accent);
+    letter-spacing: .1em;
+    text-transform: uppercase;
+  }
+
+  .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .row3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; }
+
+  .field { display: flex; flex-direction: column; gap: 4px; }
+  .field label { font-size: 10px; color: var(--text3); letter-spacing: .04em; }
+
+  input[type=number], input[type=text] {
+    width: 100%;
+    height: 30px;
+    padding: 0 8px;
+    font-size: 12px;
+    font-family: inherit;
+    background: var(--surface);
+    border: 0.5px solid var(--border2);
+    border-radius: var(--radius-sm);
+    color: var(--text);
+    transition: border-color .15s;
+    outline: none;
+  }
+  input[type=number]:focus, input[type=text]:focus {
+    border-color: var(--accent);
+  }
+  input[type=color] {
+    width: 100%;
+    height: 30px;
+    padding: 3px 4px;
+    background: var(--surface);
+    border: 0.5px solid var(--border2);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+  }
+  input[type=file] { display: none; }
+
+  .side-label {
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--text2);
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    margin-top: 3px;
+    padding-bottom: 3px;
+    border-bottom: 0.5px solid var(--border);
+  }
+
+  .logo-list { display: flex; flex-direction: column; gap: 5px; }
+
+  .logo-item {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    background: var(--surface);
+    border: 0.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 7px 8px;
+  }
+
+  .logo-row1, .logo-row2 {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  .logo-thumb {
+    width: 28px;
+    height: 28px;
+    flex-shrink: 0;
+    border-radius: 4px;
+    border: 0.5px solid var(--border2);
+    background: var(--bg);
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    color: var(--text3);
+  }
+  .logo-thumb img { width: 100%; height: 100%; object-fit: contain; }
+
+  .logo-url {
+    flex: 1;
+    height: 28px;
+    min-width: 0;
+  }
+
+  .size-label { font-size: 10px; color: var(--text3); white-space: nowrap; }
+  .size-input {
+    width: 30px;
+    height: 58px;
+    flex-shrink: 0;
+  }
+
+  .icon-btn {
+    width: 28px;
+    height: 28px;
+    flex-shrink: 0;
+    border: 0.5px solid var(--border2);
+    border-radius: var(--radius-sm);
+    background: transparent;
+    color: var(--text2);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    transition: all .15s;
+  }
+  .icon-btn:hover { background: var(--border); color: var(--text); }
+  .icon-btn.danger:hover { background: var(--danger-dim); color: var(--danger); border-color: var(--danger); }
+
+  .add-btn {
+    height: 26px;
+    padding: 0 10px;
+    font-size: 11px;
+    font-family: inherit;
+    border: 0.5px solid var(--border2);
+    border-radius: var(--radius-sm);
+    background: transparent;
+    color: var(--text3);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    transition: all .15s;
+    align-self: flex-start;
+  }
+  .add-btn:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-dim); }
+
+  .actions { display: flex; gap: 8px; flex-wrap: wrap; }
+
+  .btn {
+    height: 34px;
+    padding: 0 14px;
+    font-size: 12px;
+    font-family: inherit;
+    border: 0.5px solid var(--border2);
+    border-radius: var(--radius-sm);
+    background: transparent;
+    color: var(--text);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: all .15s;
+  }
+  .btn:hover { background: var(--surface2); border-color: var(--border2); }
+  .btn.primary {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+    font-weight: 500;
+  }
+  .btn.primary:hover { opacity: .85; }
+
+  .preview-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-shrink: 0;
+  }
+  .preview-title { font-size: 12px; color: var(--text2); display: flex; align-items: center; gap: 6px; }
+  .size-badge {
+    font-size: 11px;
+    color: var(--text2);
+    background: var(--surface);
+    border: 0.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 3px 9px;
+  }
+
+  .preview-scroll {
+    flex: 1;
+    overflow: auto;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 8px;
+    background: repeating-conic-gradient(var(--surface) 0% 25%, transparent 0% 50%) 0 0 / 16px 16px;
+    border-radius: var(--radius);
+    border: 0.5px solid var(--border);
+    scrollbar-width: thin;
+    scrollbar-color: var(--border2) transparent;
+  }
+  .preview-scroll svg {
+    max-width: 100%;
+    border-radius: 3px;
+    box-shadow: 0 0 0 1px rgba(0,0,0,.4);
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo-mark">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="color:#7c6aff">
+      <rect x="3" y="3" width="18" height="18" rx="2"/>
+      <path d="M3 9h18M9 21V9"/>
+    </svg>
+    <span>svg<em>banner</em></span>
+  </div>
+  <span class="header-meta">GitHub Actions Banner Maker</span>
+</header>
+
+<div class="app">
+<div class="sidebar">
+
+  <div class="sec">
+    <div class="sec-title">Canvas</div>
+    <div class="row2">
+      <div class="field"><label>Width (px)</label><input type="number" id="cw" value="1280" min="100" max="4000" oninput="render()"></div>
+      <div class="field"><label>Height (px)</label><input type="number" id="ch" value="640" min="100" max="4000" oninput="render()"></div>
+    </div>
+    <div class="field"><label>Background color</label><input type="color" id="bg" value="#0d1117" oninput="render()"></div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-title">Header</div>
+    <div class="row2">
+      <div class="field"><label>Color</label><input type="color" id="h1c" value="#161b22" oninput="render()"></div>
+      <div class="field"><label>Height (px)</label><input type="number" id="h1h" value="80" min="0" max="800" oninput="render()"></div>
+    </div>
+    <div class="row2">
+      <div class="field"><label>Edge padding</label><input type="number" id="h1pad" value="16" min="0" max="300" oninput="render()"></div>
+      <div class="field"><label>Logo gap</label><input type="number" id="h1gap" value="8" min="0" max="200" oninput="render()"></div>
+    </div>
+    <div class="side-label">Left logos</div>
+    <div class="logo-list" id="h1-left-list"></div>
+    <button class="add-btn" onclick="addLogo('h1','left')"><i class="ti ti-plus"></i> Add left logo</button>
+    <div class="side-label">Right logos</div>
+    <div class="logo-list" id="h1-right-list"></div>
+    <button class="add-btn" onclick="addLogo('h1','right')"><i class="ti ti-plus"></i> Add right logo</button>
+  </div>
+
+  <div class="sec">
+    <div class="sec-title">Sub-header</div>
+    <div class="row2">
+      <div class="field"><label>Color</label><input type="color" id="h2c" value="#21262d" oninput="render()"></div>
+      <div class="field"><label>Height (px)</label><input type="number" id="h2h" value="40" min="0" max="800" oninput="render()"></div>
+    </div>
+    <div class="row2">
+      <div class="field"><label>Edge padding</label><input type="number" id="h2pad" value="12" min="0" max="300" oninput="render()"></div>
+      <div class="field"><label>Logo gap</label><input type="number" id="h2gap" value="6" min="0" max="200" oninput="render()"></div>
+    </div>
+    <div class="side-label">Left logos</div>
+    <div class="logo-list" id="h2-left-list"></div>
+    <button class="add-btn" onclick="addLogo('h2','left')"><i class="ti ti-plus"></i> Add left logo</button>
+    <div class="side-label">Right logos</div>
+    <div class="logo-list" id="h2-right-list"></div>
+    <button class="add-btn" onclick="addLogo('h2','right')"><i class="ti ti-plus"></i> Add right logo</button>
+  </div>
+
+  <div class="sec">
+    <div class="sec-title">Footer</div>
+    <div class="row2">
+      <div class="field"><label>Color</label><input type="color" id="ftc" value="#161b22" oninput="render()"></div>
+      <div class="field"><label>Height (px)</label><input type="number" id="fth" value="60" min="0" max="800" oninput="render()"></div>
+    </div>
+    <div class="row2">
+      <div class="field"><label>Edge padding</label><input type="number" id="ftpad" value="16" min="0" max="300" oninput="render()"></div>
+      <div class="field"><label>Logo gap</label><input type="number" id="ftgap" value="8" min="0" max="200" oninput="render()"></div>
+    </div>
+    <div class="side-label">Left logos</div>
+    <div class="logo-list" id="ft-left-list"></div>
+    <button class="add-btn" onclick="addLogo('ft','left')"><i class="ti ti-plus"></i> Add left logo</button>
+    <div class="side-label">Right logos</div>
+    <div class="logo-list" id="ft-right-list"></div>
+    <button class="add-btn" onclick="addLogo('ft','right')"><i class="ti ti-plus"></i> Add right logo</button>
+  </div>
+
+  <div class="actions">
+    <button class="btn primary" onclick="downloadSVG()"><i class="ti ti-download"></i> Download SVG</button>
+    <button class="btn" onclick="copySVG()" id="copyBtn"><i class="ti ti-copy"></i> Copy SVG</button>
+  </div>
+
+</div>
+
+<div class="preview-pane">
+  <div class="preview-header">
+    <span class="preview-title"><i class="ti ti-eye" style="font-size:14px"></i> Live preview</span>
+    <span class="size-badge" id="dimsLabel">1280 × 640</span>
+  </div>
+  <div class="preview-scroll" id="previewScroll"></div>
+</div>
+</div>
+
+<script>
+const state={h1:{left:[],right:[]},h2:{left:[],right:[]},ft:{left:[],right:[]}};
+let uid=0;
+
+function n(id){return parseFloat(document.getElementById(id).value)||0;}
+function v(id){return document.getElementById(id).value;}
+
+function addLogo(sec,side,src,size){
+  const id=++uid;
+  state[sec][side].push({id,src:src||'',size:size||40});
+  redrawLogoList(sec,side);
+  render();
+}
+
+function removeLogo(sec,side,id){
+  state[sec][side]=state[sec][side].filter(l=>l.id!==id);
+  redrawLogoList(sec,side);
+  render();
+}
+
+function updateLogoSrc(sec,side,id,src){
+  const l=state[sec][side].find(l=>l.id===id);
+  if(l){l.src=src;updateThumb(id,src);render();}
+}
+
+function updateLogoSize(sec,side,id,val){
+  const l=state[sec][side].find(l=>l.id===id);
+  if(l){l.size=parseFloat(val)||40;render();}
+}
+
+function updateThumb(id,src){
+  const t=document.getElementById('thumb-'+id);
+  if(!t)return;
+  t.innerHTML=src
+    ?`<img src="${src}" alt="" onerror="this.parentElement.innerHTML='<i class=ti\\ ti-photo style=font-size:12px></i>'">`
+    :`<i class="ti ti-photo" style="font-size:12px"></i>`;
+}
+
+function redrawLogoList(sec,side){
+  const list=document.getElementById(`${sec}-${side}-list`);
+  list.innerHTML='';
+  state[sec][side].forEach(logo=>{
+    const item=document.createElement('div');
+    item.className='logo-item';
+    item.innerHTML=`
+      <div class="logo-row1">
+        <div class="logo-thumb" id="thumb-${logo.id}"><i class="ti ti-photo" style="font-size:12px"></i></div>
+        <input class="logo-url" type="text" placeholder="Paste image URL…" value="${logo.src||''}" oninput="updateLogoSrc('${sec}','${side}',${logo.id},this.value)">
+        <button class="icon-btn" title="Upload image" onclick="document.getElementById('file-${logo.id}').click()"><i class="ti ti-upload"></i></button>
+        <input type="file" id="file-${logo.id}" accept="image/*" onchange="handleFile('${sec}','${side}',${logo.id},this)">
+        <button class="icon-btn danger" title="Remove" onclick="removeLogo('${sec}','${side}',${logo.id})"><i class="ti ti-x"></i></button>
+      </div>
+      <div class="logo-row2">
+        <span class="size-label">Size (px)</span>
+        <input class="size-input" type="number" value="${logo.size}" min="4" max="800" oninput="updateLogoSize('${sec}','${side}',${logo.id},this.value)">
+      </div>
+    `;
+    list.appendChild(item);
+    if(logo.src)updateThumb(logo.id,logo.src);
+  });
+}
+
+function handleFile(sec,side,id,input){
+  const file=input.files[0];
+  if(!file)return;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    const l=state[sec][side].find(l=>l.id===id);
+    if(l)l.src=e.target.result;
+    const urlInput=input.previousElementSibling.previousElementSibling.previousElementSibling;
+    urlInput.value='[uploaded]';
+    updateThumb(id,e.target.result);
+    render();
+  };
+  reader.readAsDataURL(file);
+}
+
+function buildLogoImages(logos,side,stripY,stripH,padding,gap){
+  if(!logos.length)return'';
+  let out='';
+  const cy=stripY+stripH/2;
+  if(side==='left'){
+    let x=padding;
+    for(const logo of logos){
+      if(!logo.src)continue;
+      const half=logo.size/2;
+      out+=`<image href="${logo.src}" x="${x}" y="${cy-half}" width="${logo.size}" height="${logo.size}" preserveAspectRatio="xMidYMid meet"/>`;
+      x+=logo.size+gap;
+    }
+  } else {
+    const cw=n('cw');
+    let x=cw-padding;
+    for(let i=logos.length-1;i>=0;i--){
+      const logo=logos[i];
+      if(!logo.src)continue;
+      x-=logo.size;
+      const half=logo.size/2;
+      out+=`<image href="${logo.src}" x="${x}" y="${cy-half}" width="${logo.size}" height="${logo.size}" preserveAspectRatio="xMidYMid meet"/>`;
+      x-=gap;
+    }
+  }
+  return out;
+}
+
+function buildSVG(){
+  const cw=n('cw'),ch=n('ch'),bg=v('bg');
+  const h1c=v('h1c'),h1h=n('h1h'),h1pad=n('h1pad'),h1gap=n('h1gap');
+  const h2c=v('h2c'),h2h=n('h2h'),h2pad=n('h2pad'),h2gap=n('h2gap');
+  const ftc=v('ftc'),fth=n('fth'),ftpad=n('ftpad'),ftgap=n('ftgap');
+  const ftY=ch-fth;
+  return `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="${cw}" height="${ch}" viewBox="0 0 ${cw} ${ch}" role="img" aria-label="GitHub Actions banner">
+<title>GitHub Actions banner</title>
+<rect width="${cw}" height="${ch}" fill="${bg}"/>
+<rect x="0" y="0" width="${cw}" height="${h1h}" fill="${h1c}"/>
+${buildLogoImages(state.h1.left,'left',0,h1h,h1pad,h1gap)}${buildLogoImages(state.h1.right,'right',0,h1h,h1pad,h1gap)}
+<rect x="0" y="${h1h}" width="${cw}" height="${h2h}" fill="${h2c}"/>
+${buildLogoImages(state.h2.left,'left',h1h,h2h,h2pad,h2gap)}${buildLogoImages(state.h2.right,'right',h1h,h2h,h2pad,h2gap)}
+<rect x="0" y="${ftY}" width="${cw}" height="${fth}" fill="${ftc}"/>
+${buildLogoImages(state.ft.left,'left',ftY,fth,ftpad,ftgap)}${buildLogoImages(state.ft.right,'right',ftY,fth,ftpad,ftgap)}
+</svg>`;
+}
+
+function render(){
+  document.getElementById('dimsLabel').textContent=`${n('cw')} \u00d7 ${n('ch')}`;
+  document.getElementById('previewScroll').innerHTML=buildSVG();
+}
+
+function downloadSVG(){
+  const blob=new Blob([buildSVG()],{type:'image/svg+xml'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;a.download='github-actions-banner.svg';a.click();
+  URL.revokeObjectURL(url);
+}
+
+function copySVG(){
+  navigator.clipboard.writeText(buildSVG()).then(()=>{
+    const btn=document.getElementById('copyBtn');
+    const orig=btn.innerHTML;
+    btn.innerHTML='<i class="ti ti-check"></i> Copied!';
+    setTimeout(()=>btn.innerHTML=orig,1500);
+  });
+}
+
+render();
+</script>
+</body>
+</html>
