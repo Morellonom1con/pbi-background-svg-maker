@@ -144,10 +144,17 @@
     padding: 7px 8px;
   }
 
-  .logo-row1, .logo-row2 {
+  .logo-row1 {
     display: flex;
     align-items: center;
     gap: 5px;
+  }
+
+  .logo-row2 {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    width: fit-content;
   }
 
   .logo-thumb {
@@ -172,11 +179,11 @@
     min-width: 0;
   }
 
-  .size-label { font-size: 10px; color: var(--text3); white-space: nowrap; }
+  .size-label { font-size: 10px; color: var(--text3); white-space: nowrap; flex-shrink: 0; }
   .size-input {
-    width: 30px;
-    height: 58px;
+    width: 56px;
     flex-shrink: 0;
+    height: 28px;
   }
 
   .icon-btn {
@@ -318,6 +325,15 @@
     <div class="side-label">Right logos</div>
     <div class="logo-list" id="h1-right-list"></div>
     <button class="add-btn" onclick="addLogo('h1','right')"><i class="ti ti-plus"></i> Add right logo</button>
+  </div>
+
+  <div class="sec">
+    <div class="sec-title">Divider line</div>
+    <div class="row2">
+      <div class="field"><label>Color</label><input type="color" id="divc" value="#30363d" oninput="render()"></div>
+      <div class="field"><label>Width (px)</label><input type="number" id="divw" value="2" min="0" max="40" oninput="render()"></div>
+    </div>
+    <div class="field" style="font-size:10px;color:var(--text3);">Set width to 0 to hide the divider.</div>
   </div>
 
   <div class="sec">
@@ -479,14 +495,20 @@ function buildLogoImages(logos,side,stripY,stripH,padding,gap){
 function buildSVG(){
   const cw=n('cw'),ch=n('ch'),bg=v('bg');
   const h1c=v('h1c'),h1h=n('h1h'),h1pad=n('h1pad'),h1gap=n('h1gap');
+  const divw=n('divw'),divc=v('divc');
   const h2c=v('h2c'),h2h=n('h2h'),h2pad=n('h2pad'),h2gap=n('h2gap');
   const ftc=v('ftc'),fth=n('fth'),ftpad=n('ftpad'),ftgap=n('ftgap');
   const ftY=ch-fth;
+  const divY=h1h - divw/2;
+  const dividerEl = divw>0
+    ? `<rect x="0" y="${divY}" width="${cw}" height="${divw}" fill="${divc}"/>`
+    : '';
   return `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="${cw}" height="${ch}" viewBox="0 0 ${cw} ${ch}" role="img" aria-label="GitHub Actions banner">
 <title>GitHub Actions banner</title>
 <rect width="${cw}" height="${ch}" fill="${bg}"/>
 <rect x="0" y="0" width="${cw}" height="${h1h}" fill="${h1c}"/>
 ${buildLogoImages(state.h1.left,'left',0,h1h,h1pad,h1gap)}${buildLogoImages(state.h1.right,'right',0,h1h,h1pad,h1gap)}
+${dividerEl}
 <rect x="0" y="${h1h}" width="${cw}" height="${h2h}" fill="${h2c}"/>
 ${buildLogoImages(state.h2.left,'left',h1h,h2h,h2pad,h2gap)}${buildLogoImages(state.h2.right,'right',h1h,h2h,h2pad,h2gap)}
 <rect x="0" y="${ftY}" width="${cw}" height="${fth}" fill="${ftc}"/>
