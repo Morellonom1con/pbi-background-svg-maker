@@ -7,7 +7,7 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
 <style>
   :root {
-    --bg: #0f0f11;c
+    --bg: #0f0f11;
     --surface: #17171a;
     --surface2: #1e1e22;
     --border: rgba(255,255,255,0.07);
@@ -248,6 +248,33 @@
   }
   .btn.primary:hover { opacity: .85; }
 
+  .preset-switch {
+    display: flex;
+    gap: 6px;
+  }
+  .preset-btn {
+    flex: 1;
+    height: 30px;
+    padding: 0 10px;
+    font-size: 11px;
+    font-family: inherit;
+    border: 0.5px solid var(--border2);
+    border-radius: var(--radius-sm);
+    background: var(--surface);
+    color: var(--text2);
+    cursor: pointer;
+    transition: all .15s;
+  }
+  .preset-btn:hover {
+    color: var(--text);
+    border-color: var(--accent);
+  }
+  .preset-btn.active {
+    background: var(--accent-dim);
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
   .preview-header {
     display: flex;
     align-items: center;
@@ -305,6 +332,13 @@
     <div class="row2">
       <div class="field"><label>Width (px)</label><input type="number" id="cw" value="1280" min="100" max="4000" oninput="render()"></div>
       <div class="field"><label>Height (px)</label><input type="number" id="ch" value="640" min="100" max="4000" oninput="render()"></div>
+    </div>
+    <div class="field">
+      <label>Preset</label>
+      <div class="preset-switch">
+        <button type="button" class="preset-btn active" data-preset="light" onclick="applyPreset('light')">Light</button>
+        <button type="button" class="preset-btn" data-preset="dark" onclick="applyPreset('dark')">Dark</button>
+      </div>
     </div>
     <div class="field"><label>Background color</label><input type="color" id="bg" value="#fafafa" oninput="render()"></div>
   </div>
@@ -392,8 +426,38 @@
 const state={h1:{left:[],right:[]},h2:{left:[],right:[]},ft:{left:[],right:[]}};
 let uid=0;
 
+const presets = {
+  light: {
+    bg: '#fafafa',
+    h1c: '#ffffff',
+    divc: '#f0f0f0',
+    h2c: '#f2f2f2',
+    ftc: '#ffffff'
+  },
+  dark: {
+    bg: '#000000',
+    h1c: '#000000',
+    divc: '#000000',
+    h2c: '#1e1e1e',
+    ftc: '#141414'
+  }
+};
+
 function n(id){return parseFloat(document.getElementById(id).value)||0;}
 function v(id){return document.getElementById(id).value;}
+
+function applyPreset(name){
+  const preset=presets[name];
+  if(!preset)return;
+  Object.entries(preset).forEach(([id,value])=>{
+    const el=document.getElementById(id);
+    if(el) el.value=value;
+  });
+  document.querySelectorAll('.preset-btn').forEach(btn=>{
+    btn.classList.toggle('active', btn.dataset.preset===name);
+  });
+  render();
+}
 
 function addLogo(sec,side,src,size){
   const id=++uid;
